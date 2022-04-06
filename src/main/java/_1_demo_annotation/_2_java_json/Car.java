@@ -1,4 +1,4 @@
-package demo_annotation;
+package _1_demo_annotation._2_java_json;
 
 public class Car {
 

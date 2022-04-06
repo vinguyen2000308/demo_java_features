@@ -1,0 +1,120 @@
+1. Restrictions on Annotation Type
+- Annotation type thì không thể inherit từ một annotation type khác
+- Định nghĩa các method thì không thể có biến truyền vào
+    Bời:
+        Nó định nghĩa - biểu diễn element cho cái annotation type
+        Nó không được gọi để có thể thực hiện bất kì đoạn code gì
+        Methods trong đây được định nghĩa để đại diện data element
+- Định nghĩa các method thì không thể ném ra exception
+- Kiểu trả về phải là một trong các kiểu sau:
+    + Any primitive type: byte, short, int, long, float, double, boolean, and char
+    + java.lang.String
+    + java.lang.Class
+            public @interface GoodOne {
+             Class element1(); // Any Class type
+             Class<Test> element2(); // Only Test class type
+             Class<? extends Test> element3(); // Test or its subclass type
+            }
+    + An enum type
+    + An annotation type
+    + String[], int[] not nested array String[][], int[][]
+- An annotation type cannot declare a method
+
+2. Default Value of an Annotation Element
+    <modifiers> @interface <annotation type name> {
+     <data-type> <element-name>() default <default-value>;
+    }
+
+    public @interface Version {
+     int major();
+     int minor() default 0; // Set zero as default value for minor
+    }
+3. The @Retention Annotation
+- Để khai báo mục đích sử dụng của cái annotation này
+    + Source code only
+        Mục đích để documentation - instances of its type are removed when compiled into a class file
+    + Class file only
+        Để được processed bởi compiler
+        If the retention policy is “class file only,” annotation instances are retained in the class file
+    + class file and the runtime
+        Sử dụng ở runtime
+        The annotation instances are retained in the
+        class file and they are available for reading at runtime.
+
+4. The Repeatable Annotation
+    -   Java 8 added a Repeatable meta-annotation type. An annotation type declaration must be annotated with a
+@Repeatable annotation if its repeated use is to be allowed.
+
+5. Accessing Annotations at Runtime
+    - Program elements that let you access their annotations implement the java.lang.reflect.AnnotatedElement interface
+
+6. Annotation Processing at Source Code Level - how to process annotations at compile time
+    - How to develop annotation processors to process annotation at source code level
+    - Why - tại sao lại cần
+        + boilerplate code and configuration files can be generated based on annotations in the source code
+        + custom annotation-based rules can be validated at compile time
+    - two-step process
+        + 1. Write a custom annotation processor
+        + 2. You need to use the javac command line utility tool. You need to pass your custom annotation
+             processor to the javac compiler using the –processor option
+                example: javac –processor MyProcessor1,MyProcessor2 MySourceFile.java
+7. Meta Annotation Types
+- Target: chỉ định cái context mà cái annotation này có thể được dùng
+    ANNOTATION_TYPE: meta data
+    CONSTRUCTOR
+    FIELD
+    LOCAL_VARIABLE
+    METHOD
+    PACKAGE
+    PARAMETER
+    TYPE
+    TYPE_PARAMETER
+    TYPE_USE
+    -   A type is used in many contexts, for example, after the extends clause as a supertype,
+        in an object creation expression after the new operator, in a cast, in a throws clause, etc.
+
+        @Target({ElementType.TYPE_USE})
+        public @interface NonZero {
+        }
+        @Target({ElementType.TYPE_USE})
+        public @interface Fatal {
+        }
+        How to use:
+            when casting: int roundedValue = (@NonZero int) value;
+            when create new instance: Test t = new @Fatal Test();
+8. How autowire work ?
+- Spring context
+- Spring bean - Mày muốn t tạo bean gì cho m ? và m phải khai báo
+
+DEBUG:
+- Thêm code vào constructor để biết object nào được tạo và tạo bao nhiêu
+
+9. Làm sao để register processor
+- Sử dụng Annotation Processor Tool
+- Sử dụng Compiler key
+    javac -processor com.baeldung.annotation.processor.MyProcessor Person.java
+    javac -processor package1.Processor1,package2.Processor2 SourceFile.java
+- Using maven
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                    <generatedSourcesDirectory>${project.build.directory}
+                      /generated-sources/</generatedSourcesDirectory>
+                    <annotationProcessors>
+                        <annotationProcessor>
+                            com.baeldung.annotation.processor.BuilderProcessor
+                        </annotationProcessor>
+                    </annotationProcessors>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>

@@ -2,8 +2,9 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile name="Maven default annotation processors profile" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Annotation profile for demo_java_features" enabled="true">
+        <sourceOutputDir name="target/generated-sources" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="demo_java_features" />

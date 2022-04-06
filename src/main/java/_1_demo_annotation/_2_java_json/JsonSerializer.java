@@ -1,4 +1,4 @@
-package demo_annotation;
+package _1_demo_annotation._2_java_json;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;

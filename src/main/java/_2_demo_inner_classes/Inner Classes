@@ -1,0 +1,115 @@
+Nội dung:
+1. What is Inner Classes ?
+    - Inner Class là một class được định nghĩa trong một class khác
+    - Nếu như cái class đó mà là static (implicity hoặc explicity) thì gọi là nested class -> NOT INNER CLASSES
+    - Instance của một inner class phải được tồn tại bên trong its enclosing class - instance của class liền kề nó
+        => Phải có object của enclosing class thì mới tạo được object của inner class
+    - Làm sao JVM có thể làm được vậy:
+        Inner Classes được triển khai với toàn bộ sự hỗ trợ của compiler. Compiler sẽ gen ra class file riêng cho mỗi
+        inner class - the same format với top level classes. =>  JVM treat class file của inner class như là outer class.
+        Tuy nhiên compiler phải làm rất nhiều việc - behind the scene để có thể triển khai inner classes.
+    - Câu hỏi đặt ra là liệu có cách nào khác để làm được "hầu hết" những thứ inner class có thể làm mà không cần dùng đến
+        inner classes hay không ?
+        => Câu trả lời là có. Tuy nhiên thay vì dùng inner class constructs và để compiler gen thêm phần code ra cho bạn thì
+           bạn phải viết code by yourself -> Who want to reinvent the wheel?
+2. Advantages of Using Inner Classes
+    - Cho phép định nghĩa classes gần những cái class khác mà sẽ sẽ sử dụng chúng. Outer classes sẽ sử dụng inner classes
+            VD: Định nghĩa class Processor bên trong Computer class
+    - Cung cấp thêm các chức năng để quản lý class structures.
+            VD: Package -> classes -> inner classes -> More name space
+    - Một số pattern dễ dàng triển khai hơn nếu dùng inner classes
+            VD: adaptor, state, enumeration pattern
+    - Triển khai cơ chế callback dễ dàng hơn
+    - Triển khai clouse trong Java
+    - Có thể trải nghiệm multiple inheritance của classes
+            Cụ thể inner classes có thể truy cập member của enclosing class và nó có thể inherit từ class khác. Tuy nhiên chỉ bằng
+            việc truy cập members của 2 classes thì nó không phải là multiple inheritance đúng nghĩa
+3. Types of Inner Classes
+    3.1 Member Inner Class
+        - Được khai báo bên trong class như là các member field. Nó thể là public, price, protected hoặc package-level
+        - Nó chỉ có thể tồn tại ở bên trong instance của its enclosing class.
+    3.2 Local Inner Class
+        - Được khai báo bên trong block. Scope của nó sẽ bị giới hạn bởi block mà nó được khai báo.
+        - Bởi scope của nó thì luôn bị giới hạn trong its enclosing block nên nó không thể dùng các access modifier
+        - Nó có thể được định nghĩa trong các trường hợp sau:
+            + method - Typically VD: TitleList - 2.3.1
+                public class SomeTopLevelClass {
+                    // Some code for SomeTopLevelClass goes here
+                    public void someMethod() {
+                            class SomeLocalInnerClass {
+                                // Some code for SomeLocalInnerClass goes here
+                            }
+                    // SomeLocalInnerClass can only be used here
+                    }
+                }
+            Trong trường hợp này thì object của SomeLocalInnerClass chỉ được tạo và sử dụng bên trong someMethod()
+            -> Limitation là chỉ có thể được sử dụng bên trong  its enclosing block - someMethod() in case.
+            Tuy nhiên ta vẫn có thể gọi local inner class từ bên ngoài . Điều này có thể thực hiện được nhờ việc:
+                    . Implement một public interface VD 2.3.3 - Trong trường hợp này là iterator
+                    . Inherit từ một class khác và override supper class methods. VD 2.3.4
+            + static initializers
+            + non static initializers
+            + constructors
+    3.3 Anonymous Inner Class
+       - Giống như local inner class nhưng khác cái là không có tên
+            -> Không constructor -> One-time class có nghĩa là defined và created at the same time
+            -> Không thể tạo nhiều hơn một object
+            VD 2.3.5
+
+4. A static Member Class is Not an Inner Classes
+    - Class mà được định nghĩa ở trong body của một class khác có thể được khai báo là static
+    public class A {
+        // Static member class
+            public static class B {
+            // Body for class B goes here
+            }
+    }
+    - Không cần instance của its enclosing class để có thể sử dụng static class
+    - Có thể định nghĩa là public, protected, package-level hoặc private để giớ hạn truy cập ngoài its enclosing class
+    - Những usecases có thể dùng:
+        + Trong trường hợp có 2 class là A và B. Class A thì có một số biến private static thì class B có thể truy cập được
+        truy nhiên class B không thể truy cập được các instance variable của A vì B tồn tại mà không cần A VD 2_6
+        + Cung cấp namespace
+
+
+5. Creating Objects of Inner Classes
+    - Objects of a local inner class are created using the new operator inside the block.
+    - An object of an anonymous class is created at the same time the class is declared.
+    - An object of an anonymous class is created at the same time the class is declared.
+    -> Để có object của member inner class, local inner class, anonymous class thì cần phải có
+    object của it's enclosing class
+        TitleList tl = new TitleList();
+        Iterator iterator = tl.titleIterator();
+        The method call t1.titleIterator() creates an instance of the TitleIterator local inner class inside the
+        titleIterator() as TitleIterator titleIterator = new TitleIterator();
+
+     Có trường hợp mà instance của its enclosing class không cần để để có thể tạo local inner class và anonymous class
+     -> Khi mà local inner class và anonymous class được định nghĩa trong a static-context, for example, inside a static method or a static initializer
+
+
+     public class OuterA {
+        public class InnerA {
+            public class InnerAA {
+                public class InnerAAA {}
+            }
+        }
+    }
+    How to create:
+        OuterA outa = new OuterA();
+        OuterA.InnerA ina = outa.new InnerA();
+        OuterA.InnerA.InnerAA inaa = ina.new InnerAA();
+        OuterA.InnerA.InnerAA.InnerAAA inaaa = inaa.new InnerAAA();
+    After the new operator, you always use the constructor name, which is the same as the simple class name for the
+    member inner class.
+        Error If
+            Outer.Inner in = out.new Outer.Inner(); // A compile-time error
+
+
+6. Accessing Enclosing Class Members
+7. Restrictions on Accessing Local Variables
+8. Inner Classes and Inheritance
+9. No Static Members in Inner Classes
+10. Generated Class Files for Inner Classes
+11. Inner Classes and Compiler Magic
+12. Closures and Callbacks
+13. Defining Inner Classes in Static Contexts
